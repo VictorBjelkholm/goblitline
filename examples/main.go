@@ -8,20 +8,28 @@ import (
 )
 
 func main() {
-	con := Container("valparaiso")
+	destination := &S3Destination{Bucket: "buildapi-images"}
+	destination_with_key := &S3Destination{Bucket: "buildapi-images", Key: "my-custom-key"}
+
+	con1 := Container("valparaiso-1").S3Destination("your_identifier", destination)
+	con2 := Container("valparaiso-2").S3Destination("your_identifier", destination_with_key)
+	con3 := Container("valparaiso-3")
+
+	fmt.Printf("%+v\n", con1.S3Destination)
+	fmt.Printf("%+v\n", con3.S3Destination)
 
 	f1 := Function("annotate").
 		Params("text", "Valpo").
 		Params("color", "#ffffff").
-		Save(con)
+		Save(con1)
 
 	f2 := Function("annotate").
 		Params("text", "github.com/Typeform/goblitline").
 		Params("color", "#000000").
 		Params("y", -300).
-		Save(con)
+		Save(con2)
 
-	f3 := Function("vignette").Save(con)
+	f3 := Function("vignette").Save(con3)
 
 	job := Job(os.Getenv("BLITLINE_APP_ID")).
 		Functions(f1, f2, f3).
