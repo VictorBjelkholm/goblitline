@@ -2,9 +2,15 @@ package goblitline
 
 import "github.com/lann/builder"
 
+type S3Destination struct {
+	Bucket string `json:"bucket"`
+	Key    string `json:"key"`
+}
+
 type containerData struct {
-	ImageIdentifier string `json:"image_identifier"`
-	Quality         uint   `json:"quality"`
+	ImageIdentifier string         `json:"image_identifier"`
+	Quality         uint           `json:"quality"`
+	S3Destination   *S3Destination `json:"s3_destination,omitempty"`
 }
 
 type ContainerBuilder builder.Builder
@@ -19,6 +25,10 @@ func (b ContainerBuilder) ImageIdentifier(id string) ContainerBuilder {
 
 func (b ContainerBuilder) Quality(quality uint) ContainerBuilder {
 	return builder.Set(b, "Quality", quality).(ContainerBuilder)
+}
+
+func (b ContainerBuilder) S3Destination(destination *S3Destination) ContainerBuilder {
+	return builder.Set(b, "S3Destination", destination).(ContainerBuilder)
 }
 
 func (b ContainerBuilder) build() containerData {
