@@ -1,6 +1,10 @@
 package goblitline
 
-import "github.com/lann/builder"
+import (
+	"math/rand"
+
+	"github.com/lann/builder"
+)
 
 type S3Destination struct {
 	Bucket string `json:"bucket"`
@@ -27,7 +31,23 @@ func (b ContainerBuilder) Quality(quality uint) ContainerBuilder {
 	return builder.Set(b, "Quality", quality).(ContainerBuilder)
 }
 
-func (b ContainerBuilder) S3Destination(destination *S3Destination) ContainerBuilder {
+var alphanum = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+func randString(size int) string {
+	buf := make([]byte, size)
+	for i := 0; i < size; i++ {
+		buf[i] = alphanum[rand.Intn(len(alphanum))]
+	}
+	return string(buf)
+}
+
+func (b ContainerBuilder) S3Destination(identifier string, destination *S3Destination) ContainerBuilder {
+	if destination.Key == "" {
+		destination.Key = identifier + "-" + randString(10)
+	}
+	if destination.Bucket == "" {
+		panic("You need to set S3Destination.Bucket")
+	}
 	return builder.Set(b, "S3Destination", destination).(ContainerBuilder)
 }
 
